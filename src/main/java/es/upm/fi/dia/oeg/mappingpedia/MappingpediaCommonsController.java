@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class MappingpediaCommonsController {
     static Logger logger = LoggerFactory.getLogger("MappingpediaCommonsController");
     private MpcCkanUtility ckanClient = MpcCkanUtility.apply();
+    private MpcVirtuosoUtility virtuosoUtility = MpcVirtuosoUtility.apply();
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
@@ -66,5 +67,22 @@ public class MappingpediaCommonsController {
         }
     }
 
+    @RequestMapping(value="/instance_details", method= RequestMethod.GET)
+    public ListResult<MpcTriple> getInstanceDetails(
+            @RequestParam(value="subject_uri") String subjectUri
+    ) {
+        logger.info("GET /instance_details ...");
+
+        try {
+            ListResult<MpcTriple> result = this.virtuosoUtility.getInstanceDetails(subjectUri);
+            return result;
+        } catch(Exception e) {
+            e.printStackTrace();
+            ListResult<MpcTriple> result = new ListResult<MpcTriple>();
+            result.statusCode_$eq(500);
+            result.statusMessage_$eq(e.getMessage());
+            return result;
+        }
+    }
 
 }
